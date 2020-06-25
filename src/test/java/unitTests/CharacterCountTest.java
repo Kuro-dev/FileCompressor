@@ -34,10 +34,17 @@ public class CharacterCountTest {
     @Test
     public void translatorShouldTranslateCorrectly() {
         String testString = "aaaaabbbbccc";
-        int testResult = 0b11111101010101001001001;
         SymbolTable table = SymbolTable.create(testString);
-        long compressed = table.translate(testString);
-        assertEquals(testResult, compressed);
-        assertEquals(testString, table.retranslate(testResult));
+        long compressed = table.encode(testString);
+        System.out.println("result: " + compressed);
+        assertEquals(testString, table.decode(compressed));
+    }
+
+    private String binaryString(byte[] bytes) {
+        StringBuilder builder = new StringBuilder();
+        for (byte aByte : bytes) {
+            builder.append(Integer.toBinaryString(aByte));
+        }
+        return builder.toString();
     }
 }

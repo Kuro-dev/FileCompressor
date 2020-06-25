@@ -28,7 +28,7 @@ public class CharCounter {
     @Override
     public String toString() {
         return "{" +
-                "chara=" + chara +
+                "char=" + chara +
                 ", counter=" + counter +
                 '}';
     }
