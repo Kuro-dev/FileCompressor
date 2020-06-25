@@ -54,11 +54,11 @@ public class SymbolTable {
         }
     }
 
-    public long translate(String chars) {
-        return translate(chars.toCharArray());
+    public long encode(String chars) {
+        return encode(chars.toCharArray());
     }
 
-    public long translate(char[] chars) {
+    public long encode(char[] chars) {
         long result = 1;
         for (char aChar : chars) {
             CharCounter counter = find(aChar);
@@ -89,7 +89,7 @@ public class SymbolTable {
         throw new RuntimeException("code missing in table: '" + leadingZeros + "'");
     }
 
-    public String retranslate(long msg) {
+    public String decode(long msg) {
         StringBuilder result = new StringBuilder();
         long i = msg;
         while (i > 1) {
