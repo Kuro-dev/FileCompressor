@@ -34,4 +34,19 @@ public class TableFactory {
         }
         return new CharCounter(character);
     }
+
+    //TODO most likely not working as intended.
+    public static SymbolTable createFromFile(byte[] tableData) {
+        final List<CharCounter> counters = new ArrayList<>();
+        for (int i = 0; i < tableData.length; i++) {
+            if (tableData.length > (i + 1)) {
+                byte key = tableData[i];
+                byte leadingZeros = tableData[i];
+                CharCounter counter = new CharCounter(key);
+                counter.setLeadingZeros(leadingZeros);
+                counters.add(counter);
+            }
+        }
+        return new SymbolTable(counters);
+    }
 }

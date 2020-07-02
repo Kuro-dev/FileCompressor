@@ -3,6 +3,7 @@ package com.kurodev.filecompressor.table;
 import com.kurodev.filecompressor.byteutils.reader.ByteReader;
 import com.kurodev.filecompressor.byteutils.writer.ByteWriter;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -12,6 +13,8 @@ import java.util.List;
  * @see TableFactory
  **/
 public class SymbolTable {
+    public static final byte[] END_OF_TABLE_MARKER = {0x1b, 0x1b, 0x17};
+
     private final List<CharCounter> characterList;
 
     /**
@@ -70,6 +73,7 @@ public class SymbolTable {
         throw new RuntimeException("code missing in table: '" + leadingZeros + "'");
     }
 
+    //TODO REDO THIS MESS AHHHH. It does not work.
     public String decode(byte[] msg) {
         final StringBuilder builder = new StringBuilder();
         final ByteReader reader = new ByteReader(msg);
@@ -85,5 +89,17 @@ public class SymbolTable {
             }
         }
         return builder.toString();
+    }
+
+    public byte[] getTable() {
+        final ByteArrayOutputStream os = new ByteArrayOutputStream(characterList.size() * 2);
+        for (CharCounter counter : characterList) {
+            byte character = counter.getCharacter();
+            int lead = counter.getLeadingZeros();
+            os.write(character);
+            os.write(lead);
+        }
+        os.write(END_OF_TABLE_MARKER, 0, END_OF_TABLE_MARKER.length);
+        return os.toByteArray();
     }
 }
