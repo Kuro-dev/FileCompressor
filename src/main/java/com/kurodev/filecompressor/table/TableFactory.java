@@ -6,6 +6,7 @@ import java.util.List;
 /**
  * @author kuro
  **/
+//todo add deserialization Method for Creating from existing file
 public class TableFactory {
 
     public static SymbolTable create(byte[] source) {

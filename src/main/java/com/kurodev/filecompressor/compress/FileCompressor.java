@@ -54,6 +54,7 @@ public class FileCompressor implements Runnable {
             fail("Cannot read file");
     }
 
+    //TODO serialize SymbolTable to bytecode to write to file.
     @Override
     public void run() {
         try {
