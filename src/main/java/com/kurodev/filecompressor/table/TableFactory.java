@@ -41,7 +41,7 @@ public class TableFactory {
         for (int i = 0; i < tableData.length; i++) {
             if (tableData.length > (i + 1)) {
                 byte key = tableData[i];
-                byte leadingZeros = tableData[i];
+                byte leadingZeros = tableData[i + 1];
                 CharCounter counter = new CharCounter(key);
                 counter.setLeadingZeros(leadingZeros);
                 counters.add(counter);

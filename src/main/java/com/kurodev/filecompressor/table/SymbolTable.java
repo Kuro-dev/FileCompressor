@@ -82,6 +82,7 @@ public class SymbolTable {
             boolean isAOne = reader.read();
             if (isAOne) {
                 char character = (char) find(zeros);
+                System.out.println("character = " + character + "(" + (byte) character + ")");
                 builder.append(character);
                 zeros = 0;
             } else {
