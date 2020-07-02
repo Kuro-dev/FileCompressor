@@ -38,7 +38,7 @@ public class CharacterCountTest {
         String testString = "asdateastasf";
         SymbolTable table = TableFactory.create(testString);
         byte[] compressed = table.encode(testString);
-        assertEquals(testString, table.decode(compressed));
+        assertEquals(testString, new String(table.decode(compressed)));
     }
 
     @Test

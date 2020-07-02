@@ -6,6 +6,7 @@ import com.kurodev.filecompressor.exception.ErrorCode;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.function.Consumer;
 
 /**
@@ -68,6 +69,13 @@ public abstract class FileOperationHandler implements Runnable {
         } catch (IOException e) {
             fail(e);
         }
+    }
+
+    protected void writeFile(byte[] bytes) throws IOException {
+        if (!Files.exists(dest)) {
+            Files.createFile(dest);
+        }
+        Files.write(dest, bytes, StandardOpenOption.WRITE);
     }
 
     protected abstract void work() throws IOException;

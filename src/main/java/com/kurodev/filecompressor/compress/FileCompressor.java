@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 
 /**
  * @author kuro
@@ -45,9 +44,6 @@ public class FileCompressor extends FileOperationHandler {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         output.write(table.getTable());
         output.write(table.encode(content));
-        if (!Files.exists(dest)) {
-            Files.createFile(dest);
-        }
-        Files.write(dest, output.toByteArray(), StandardOpenOption.WRITE);
+        writeFile(output.toByteArray());
     }
 }

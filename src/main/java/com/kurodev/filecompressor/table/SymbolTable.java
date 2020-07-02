@@ -74,22 +74,21 @@ public class SymbolTable {
     }
 
     //TODO REDO THIS MESS AHHHH. It does not work.
-    public String decode(byte[] msg) {
-        final StringBuilder builder = new StringBuilder();
+    public byte[] decode(byte[] msg) {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
         final ByteReader reader = new ByteReader(msg);
         int zeros = 0;
         while (reader.hasMore()) {
             boolean isAOne = reader.read();
             if (isAOne) {
                 char character = (char) find(zeros);
-                System.out.println("character = " + character + "(" + (byte) character + ")");
-                builder.append(character);
+                os.write(character);
                 zeros = 0;
             } else {
                 zeros++;
             }
         }
-        return builder.toString();
+        return os.toByteArray();
     }
 
     public byte[] getTable() {

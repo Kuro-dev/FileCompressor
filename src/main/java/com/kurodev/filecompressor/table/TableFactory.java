@@ -38,7 +38,7 @@ public class TableFactory {
     //TODO most likely not working as intended.
     public static SymbolTable createFromFile(byte[] tableData) {
         final List<CharCounter> counters = new ArrayList<>();
-        for (int i = 0; i < tableData.length; i++) {
+        for (int i = 0; i < tableData.length; i = i + 2) {
             if (tableData.length > (i + 1)) {
                 byte key = tableData[i];
                 byte leadingZeros = tableData[i + 1];
