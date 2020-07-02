@@ -1,7 +1,7 @@
 package com.kurodev.filecompressor.compress;
 
 import com.kurodev.filecompressor.table.SymbolTable;
-import com.kurodev.filecompressor.util.ByteUtils;
+import com.kurodev.filecompressor.table.TableFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -59,8 +59,8 @@ public class FileCompressor implements Runnable {
         try {
             checkCompressibility();
             final String content = Files.readString(source);
-            final SymbolTable table = SymbolTable.create(content);
-            byte[] bytes = ByteUtils.longToBytes(table.encode(content));
+            final SymbolTable table = TableFactory.create(content);
+            byte[] bytes = table.encode(content);
             Files.write(dest, bytes, StandardOpenOption.WRITE);
             if (onDone != null) {
                 onDone.accept(dest);

@@ -4,16 +4,16 @@ package com.kurodev.filecompressor.table;
  * @author kuro
  **/
 public class CharCounter {
-    private final char chara;
+    private final byte chara;
     private int counter;
     private int leadingZeros;
 
-    CharCounter(char chara, int counter) {
+    CharCounter(byte chara, int counter) {
         this.chara = chara;
         this.counter = counter;
     }
 
-    public CharCounter(char character) {
+    public CharCounter(byte character) {
         this(character, 0);
     }
 
@@ -28,7 +28,7 @@ public class CharCounter {
     @Override
     public String toString() {
         return "{" +
-                "char=" + chara +
+                "char=" + (char) chara +
                 ", counter=" + counter +
                 '}';
     }
@@ -37,7 +37,7 @@ public class CharCounter {
         counter++;
     }
 
-    public char getCharacter() {
+    public byte getCharacter() {
         return chara;
     }
 

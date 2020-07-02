@@ -1,46 +1,26 @@
 package com.kurodev.filecompressor.table;
 
-import java.util.ArrayList;
+import com.kurodev.filecompressor.byteutils.reader.ByteReader;
+import com.kurodev.filecompressor.byteutils.writer.ByteWriter;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 /**
  * @author kuro
+ * @see TableFactory
  **/
 public class SymbolTable {
     private final List<CharCounter> characterList;
 
-    private SymbolTable(List<CharCounter> characterList) {
+    /**
+     * Use {@link TableFactory} to create object instance.
+     */
+    SymbolTable(List<CharCounter> characterList) {
         characterList.sort(Comparator.comparingInt(CharCounter::getCount));
         Collections.reverse(characterList);
         this.characterList = characterList;
-    }
-
-    public static SymbolTable create(String source) {
-        return create(source.toCharArray());
-    }
-
-    public static SymbolTable create(char[] source) {
-        List<CharCounter> counters = new ArrayList<>();
-        for (char aChar : source) {
-            CharCounter counter = find(counters, aChar);
-            counter.increment();
-            if (!counters.contains(counter))
-                counters.add(counter);
-        }
-        SymbolTable table = new SymbolTable(counters);
-        table.evaluateTable();
-        return table;
-    }
-
-    private static CharCounter find(List<CharCounter> list, char character) {
-        for (CharCounter charCounter : list) {
-            if (charCounter.getCharacter() == character) {
-                return charCounter;
-            }
-        }
-        return new CharCounter(character);
     }
 
     public List<CharCounter> getCharacterList() {
@@ -50,28 +30,29 @@ public class SymbolTable {
     public void evaluateTable() {
         for (int i = 0; i < characterList.size(); i++) {
             CharCounter charCounter = characterList.get(i);
-            charCounter.setLeadingZeros(i + 1);
+            charCounter.setLeadingZeros(i);
         }
     }
 
-    public long encode(String chars) {
-        return encode(chars.toCharArray());
+    public byte[] encode(String chars) {
+        return encode(chars.getBytes());
     }
 
-    public long encode(char[] chars) {
-        long result = 1;
-        for (char aChar : chars) {
-            CharCounter counter = find(aChar);
-            int lead = counter.getLeadingZeros();
-            result = result << lead;
-            result++;
+    public byte[] encode(byte[] chars) {
+        ByteWriter writer = new ByteWriter();
+        for (byte chara : chars) {
+            CharCounter character = this.find(chara);
+            int zeros = character.getLeadingZeros();
+            for (int i = 0; i < zeros; i++) {
+                writer.writeZero();
+            }
+            writer.writeOne();
         }
-        System.out.println("result: " + result);
-        System.out.println(Long.toBinaryString(result));
-        return result;
+        writer.fillLastByte();
+        return writer.getBytes();
     }
 
-    private CharCounter find(char aChar) {
+    private CharCounter find(byte aChar) {
         for (CharCounter charCounter : characterList) {
             if (charCounter.getCharacter() == aChar) {
                 return charCounter;
@@ -80,7 +61,7 @@ public class SymbolTable {
         throw new RuntimeException("Char missing in table: '" + aChar + "'");
     }
 
-    private char find(int leadingZeros) {
+    private byte find(int leadingZeros) {
         for (CharCounter charCounter : characterList) {
             if (charCounter.getLeadingZeros() == leadingZeros) {
                 return charCounter.getCharacter();
@@ -89,20 +70,20 @@ public class SymbolTable {
         throw new RuntimeException("code missing in table: '" + leadingZeros + "'");
     }
 
-    public String decode(long msg) {
-        StringBuilder result = new StringBuilder();
-        long i = msg;
-        while (i > 1) {
-            int count = 1;
-            if ((i & 1) == 1) {
-                while (((i = i >> 1) & 1) == 0) {
-                    count++;
-                }
-                char character = find(count);
-                result.append(character);
+    public String decode(byte[] msg) {
+        final StringBuilder builder = new StringBuilder();
+        final ByteReader reader = new ByteReader(msg);
+        int zeros = 0;
+        while (reader.hasMore()) {
+            boolean isAOne = reader.read();
+            if (isAOne) {
+                char character = (char) find(zeros);
+                builder.append(character);
+                zeros = 0;
+            } else {
+                zeros++;
             }
         }
-        result.reverse();
-        return result.toString();
+        return builder.toString();
     }
 }
