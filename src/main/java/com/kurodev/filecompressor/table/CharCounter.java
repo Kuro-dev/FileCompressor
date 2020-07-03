@@ -30,6 +30,7 @@ public class CharCounter {
         return "{" +
                 "char=" + (char) chara +
                 ", counter=" + counter +
+                ", leadingZeros=" + leadingZeros +
                 '}';
     }
 

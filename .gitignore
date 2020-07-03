@@ -1,3 +1,5 @@
 *.iml
 .idea
 target
+*.cmp
+/testfiles/TestDecompressionFile.txt

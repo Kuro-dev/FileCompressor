@@ -1,9 +1,12 @@
-package com.kurodev.filecompressor.compress;
+package com.kurodev.filecompressor.exception;
 
 /**
  * @author kuro
  **/
-public class CompressionException extends RuntimeException{
+public class CompressionException extends RuntimeException {
+    public CompressionException(ErrorCode code) {
+        this("Error " + code.ordinal() + ":" + code.name());
+    }
 
     public CompressionException() {
     }
