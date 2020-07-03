@@ -45,7 +45,8 @@ public class CharacterCountTest {
     @Parameters({
             "TestString",
             "Lorem ipsum dolor sit amet consetetur sadipscing elitr",
-            "ASRTOIHASTOANSTATSASTJAStasdtohsdtosz"
+            "ASRTOIHASTOANSTATSASTJAStasdtohsdtosz",
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
     })
     public void compressedByteCodeShouldBeSmaller(String testString) {
         SymbolTable table = TableFactory.create(testString);

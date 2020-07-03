@@ -13,7 +13,7 @@ import static org.junit.Assert.assertEquals;
  * @author kuro
  **/
 public class FileCompressorTest {
-    private static final Path TEST_FILE = Paths.get(System.getProperty("user.dir") + "/testfiles/TestCompressionFile.txt");
+    private static final Path TEST_FILE = Paths.get("./testfiles/TestCompressionFile.txt");
 
     @Test
     public void findCanGenerateDestinationFile() {

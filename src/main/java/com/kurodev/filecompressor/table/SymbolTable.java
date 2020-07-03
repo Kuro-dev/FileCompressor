@@ -73,7 +73,6 @@ public class SymbolTable {
         throw new RuntimeException("code missing in table: '" + leadingZeros + "'");
     }
 
-    //TODO REDO THIS MESS AHHHH. It does not work.
     public byte[] decode(byte[] msg) {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         final ByteReader reader = new ByteReader(msg);

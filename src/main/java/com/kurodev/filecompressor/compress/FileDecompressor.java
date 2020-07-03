@@ -42,7 +42,7 @@ public class FileDecompressor extends FileOperationHandler {
             fail(ErrorCode.FILE_SIGNATURE_MISMATCH);
         }
         //TODO remove magic number because the first part of the END_OF_TABLE_MARKER sadly ends up in the array.
-        int messageIndex = splitIndex + (SymbolTable.END_OF_TABLE_MARKER.length - 1);
+        int messageIndex = splitIndex + (SymbolTable.END_OF_TABLE_MARKER.length);
         byte[] tableData = new byte[splitIndex];
         System.arraycopy(data, 0, tableData, 0, splitIndex);
         SymbolTable table = TableFactory.createFromFile(tableData);

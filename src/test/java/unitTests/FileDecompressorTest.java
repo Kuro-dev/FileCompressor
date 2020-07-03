@@ -14,8 +14,8 @@ import static org.junit.Assert.assertEquals;
  * @author kuro
  **/
 public class FileDecompressorTest {
-    private static final Path TEST_FILE = Paths.get(System.getProperty("user.dir") + "/testfiles/TestCompressionFile.txt.cmp");
-    private static final Path TEST_DEST_FILE = Paths.get(System.getProperty("user.dir") + "/testfiles/TestDecompressionFile.txt");
+    private static final Path TEST_FILE = Paths.get("./testfiles/TestCompressionFile.txt.cmp");
+    private static final Path TEST_DEST_FILE = Paths.get("./testfiles/TestDecompressionFile.txt");
 
     @Test
     public void findCanGenerateDestinationFile() {
