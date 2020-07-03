@@ -1,9 +1,11 @@
 package com.kurodev.filecompressor.exception;
 
+import java.io.IOException;
+
 /**
  * @author kuro
  **/
-public class CompressionException extends RuntimeException {
+public class CompressionException extends IOException {
     public CompressionException(ErrorCode code) {
         this("Error " + code.ordinal() + ":" + code.name());
     }
@@ -23,7 +25,4 @@ public class CompressionException extends RuntimeException {
         super(cause);
     }
 
-    public CompressionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
 }

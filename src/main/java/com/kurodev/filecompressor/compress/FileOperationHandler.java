@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.function.Consumer;
 
 /**
  * @author kuro
@@ -15,11 +14,7 @@ import java.util.function.Consumer;
 public abstract class FileOperationHandler implements Runnable {
     protected final Path source;
     protected final Path dest;
-    private Consumer<Path> onDone;
-
-    public Path getSrcFile() {
-        return source;
-    }
+    private CompressionCallback callback;
 
     /**
      * @param source the source file to compress.
@@ -31,19 +26,23 @@ public abstract class FileOperationHandler implements Runnable {
         this.dest = dest;
     }
 
+    public Path getSrcFile() {
+        return source;
+    }
+
     public Path getDestFile() {
         return dest;
     }
 
-    protected void fail(String reason) {
+    protected void fail(String reason) throws CompressionException {
         throw new CompressionException(reason);
     }
 
-    protected void fail(IOException e) {
+    protected void fail(IOException e) throws CompressionException {
         throw new CompressionException(e);
     }
 
-    protected void fail(ErrorCode code) {
+    protected void fail(ErrorCode code) throws CompressionException {
         throw new CompressionException(code);
     }
 
@@ -51,11 +50,11 @@ public abstract class FileOperationHandler implements Runnable {
      * Sets a consumer to be notified once the operation has been successfully executed.
      * The consumer will NOT be notified if the operation fails, as this will result in a RuntimeException.
      */
-    public void setOnDone(Consumer<Path> onDone) {
-        this.onDone = onDone;
+    public void setCallback(CompressionCallback callback) {
+        this.callback = callback;
     }
 
-    private void checkFileAccessibility() {
+    private void checkFileAccessibility() throws CompressionException {
         if (!Files.isRegularFile(source))
             fail("Must be a file");
         if (!Files.isReadable(source))
@@ -67,11 +66,14 @@ public abstract class FileOperationHandler implements Runnable {
         try {
             checkFileAccessibility();
             work();
-            if (onDone != null) {
-                onDone.accept(dest);
-            }
+            if (callback != null)
+                callback.onDone(dest);
         } catch (IOException e) {
-            fail(e);
+            if (callback != null) {
+                callback.onFail(e);
+            } else {
+                throw new RuntimeException(e);
+            }
         }
     }
 
