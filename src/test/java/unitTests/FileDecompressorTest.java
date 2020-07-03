@@ -24,18 +24,18 @@ public class FileDecompressorTest {
     @AfterClass
     public static void deleteTestFiles() throws IOException {
         for (Path path : deleteOnDone) {
-            Files.delete(path);
+            Files.deleteIfExists(path);
         }
     }
 
     @Test
-    public void findCanGenerateDestinationFile() {
+    public void findCanGenerateDestinationFileTest() {
         FileDecompressor comp = new FileDecompressor(TEST_FILE);
         assertEquals("TestCompressionFile.txt", comp.getDestFile().getFileName().toString());
     }
 
     @Test
-    public void compareFileHash() throws IOException {
+    public void compareFileContentTest() throws IOException {
         FileCompressor compressor = new FileCompressor(TEST_FILE);
         compressor.run();
         deleteOnDone.add(compressor.getDestFile());
@@ -46,7 +46,7 @@ public class FileDecompressorTest {
     }
 
     @Test
-    public void compareSmallerFileContent() throws IOException {
+    public void compareSmallerFileContentTest() throws IOException {
         FileCompressor compressor = new FileCompressor(SMALLER_TEST_FILE);
         compressor.run();
         deleteOnDone.add(compressor.getDestFile());
