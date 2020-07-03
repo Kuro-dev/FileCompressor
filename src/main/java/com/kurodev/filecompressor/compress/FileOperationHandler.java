@@ -17,6 +17,10 @@ public abstract class FileOperationHandler implements Runnable {
     protected final Path dest;
     private Consumer<Path> onDone;
 
+    public Path getSrcFile() {
+        return source;
+    }
+
     /**
      * @param source the source file to compress.
      * @param dest   the destination file to generate

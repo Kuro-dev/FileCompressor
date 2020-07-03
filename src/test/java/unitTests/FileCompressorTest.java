@@ -3,17 +3,15 @@ package unitTests;
 import com.kurodev.filecompressor.compress.FileCompressor;
 import org.junit.Test;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import static org.junit.Assert.assertEquals;
+import static unitTests.TestFiles.TEST_FILE;
 
 
 /**
  * @author kuro
  **/
 public class FileCompressorTest {
-    private static final Path TEST_FILE = Paths.get("./testfiles/TestCompressionFile.txt");
+
 
     @Test
     public void findCanGenerateDestinationFile() {
