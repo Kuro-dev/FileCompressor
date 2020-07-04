@@ -3,7 +3,7 @@ package com.kurodev.filecompressor.table;
 import com.kurodev.filecompressor.byteutils.reader.ByteReader;
 import com.kurodev.filecompressor.byteutils.writer.ByteWriter;
 
-import java.io.ByteArrayOutputStream;
+import java.io.*;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
  * @see TableFactory
  **/
 public class SymbolTable {
-    public static final byte[] END_OF_TABLE_MARKER = {0x1b, 0x1b, 0x17};
+    public static final byte[] END_OF_TABLE_MARKER = {0x17, 0x1b, 0x1b, 0x17};
 
     private final List<CharCounter> characterList;
 
@@ -55,14 +55,20 @@ public class SymbolTable {
         throw new RuntimeException("code missing in table: '" + leadingZeros + "'");
     }
 
-    public byte[] encode(String chars) {
-        return encode(chars.getBytes());
+    /**
+     * not recommended to use for large input.
+     */
+    public byte[] encode(String chars) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        encode(new ByteArrayInputStream(chars.getBytes()), out);
+        return out.toByteArray();
     }
 
-    public byte[] encode(byte[] chars) {
-        ByteWriter writer = new ByteWriter();
-        for (byte chara : chars) {
-            CharCounter character = this.find(chara);
+    public void encode(InputStream in, OutputStream out) throws IOException {
+        ByteWriter writer = new ByteWriter(out);
+        int chara;
+        while ((chara = in.read()) != -1) {
+            CharCounter character = this.find((byte) chara);
             int zeros = character.getLeadingZeros();
             for (int i = 0; i < zeros; i++) {
                 writer.writeZero();
@@ -70,24 +76,22 @@ public class SymbolTable {
             writer.writeOne();
         }
         writer.fillLastByte();
-        return writer.getBytes();
     }
 
-    public byte[] decode(byte[] msg) {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        final ByteReader reader = new ByteReader(msg);
+    public void decode(InputStream in, OutputStream out) throws IOException {
+        final ByteReader reader = new ByteReader(in);
         int zeros = 0;
         while (reader.hasMore()) {
             boolean isAOne = reader.read();
             if (isAOne) {
                 char character = (char) find(zeros);
-                os.write(character);
+                out.write(character);
+                out.flush();
                 zeros = 0;
             } else {
                 zeros++;
             }
         }
-        return os.toByteArray();
     }
 
     public byte[] getTable() {
