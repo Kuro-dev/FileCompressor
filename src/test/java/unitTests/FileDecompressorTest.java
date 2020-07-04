@@ -2,14 +2,12 @@ package unitTests;
 
 import com.kurodev.filecompressor.compress.FileCompressor;
 import com.kurodev.filecompressor.compress.FileDecompressor;
-import org.junit.AfterClass;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -18,15 +16,7 @@ import static unitTests.TestFiles.*;
 /**
  * @author kuro
  **/
-public class FileDecompressorTest {
-    private static final List<Path> deleteOnDone = new ArrayList<>();
-
-    @AfterClass
-    public static void deleteTestFiles() throws IOException {
-        for (Path path : deleteOnDone) {
-            Files.deleteIfExists(path);
-        }
-    }
+public class FileDecompressorTest extends FileCompressorTest {
 
     @Test
     public void findCanGenerateDestinationFileTest() {

@@ -5,6 +5,7 @@ import com.kurodev.filecompressor.interfaces.ProgressCallBack;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author kuro
@@ -12,6 +13,7 @@ import java.nio.file.Path;
 public class TestCallback implements ProgressCallBack, CompressionCallback {
 
     private final double interval;
+    private final CountDownLatch latch = new CountDownLatch(1);
 
     public TestCallback(double interval) {
         this.interval = interval;
@@ -25,6 +27,11 @@ public class TestCallback implements ProgressCallBack, CompressionCallback {
     @Override
     public void onDone(Path path) {
         System.out.println("File compression successful!");
+        latch.countDown();
+    }
+
+    public CountDownLatch getLatch() {
+        return latch;
     }
 
     @Override
