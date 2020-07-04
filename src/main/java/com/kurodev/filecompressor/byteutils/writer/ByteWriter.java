@@ -1,63 +1,47 @@
 package com.kurodev.filecompressor.byteutils.writer;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * @author Kuro
  */
 public class ByteWriter {
 
-    private final List<Byte> bytes = new ArrayList<>();
     private final WritableByte current = new WritableByte();
+    private final OutputStream out;
 
-    private void checkCurrentByte() {
+    public ByteWriter(OutputStream out) {
+        this.out = out;
+    }
+
+    private void checkCurrentByte() throws IOException {
         if (!current.hasSpace()) {
-            byte abyte = current.getByte();
-            bytes.add(abyte);
+            byte aByte = current.getByte();
+            out.write(aByte);
+            out.flush();
             current.reset();
         }
     }
 
-    public void writeZero() {
+    public void writeZero() throws IOException {
         checkCurrentByte();
         current.addZero();
     }
 
-    public void writeOne() {
+    public void writeOne() throws IOException {
         checkCurrentByte();
         current.addOne();
     }
 
     /**
      * Fills up the currently started byte with zeros and pushes it to the stream.
-     * Recommended to use before invoking the {@link #getBytes()} method.
      */
-    public void fillLastByte() {
+    public void fillLastByte() throws IOException {
         if (current.getByte() > 0) {
             current.fill();
-            bytes.add(current.getByte());
+            out.write(current.getByte());
             current.reset();
         }
-    }
-
-    public byte[] getBytes() {
-        byte[] ret = new byte[bytes.size()];
-        for (int i = 0; i < ret.length; i++) {
-            ret[i] = bytes.get(i);
-        }
-        return ret;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        for (byte aByte : bytes) {
-            int val = Byte.toUnsignedInt(aByte);
-            builder.append(Integer.toBinaryString(val));
-        }
-        int val = Byte.toUnsignedInt(current.getByte());
-        builder.append(Integer.toBinaryString(val));
-        return builder.toString();
     }
 }
