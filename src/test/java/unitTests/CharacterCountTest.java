@@ -7,6 +7,10 @@ import junitparams.Parameters;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -19,8 +23,8 @@ public class CharacterCountTest {
     @Parameters({"test,3",
             "tt,1",
             "tT,2"})
-    public void testCharacterCountFindsAllChars(String testSource, int desiredResult) {
-        SymbolTable table = TableFactory.create(testSource);
+    public void testCharacterCountFindsAllChars(String testString, int desiredResult) throws IOException {
+        SymbolTable table = TableFactory.create(new ByteArrayInputStream(testString.getBytes()));
         assertEquals(table.getCharacterList().size(), desiredResult);
     }
 
@@ -28,17 +32,21 @@ public class CharacterCountTest {
     @Parameters({
             "tttttttt,8", "dddd4aaaaa5,5"
     })
-    public void testCharacterCountCountsRightAmountsOfMostUsedCharacter(String test, int result) {
-        SymbolTable table = TableFactory.create(test);
+    public void testCharacterCountCountsRightAmountsOfMostUsedCharacter(String testSource, int result) throws IOException {
+        SymbolTable table = TableFactory.create(new ByteArrayInputStream(testSource.getBytes()));
         assertEquals(table.getCharacterList().get(0).getCount(), result);
     }
 
     @Test
-    public void translatorShouldTranslateCorrectly() {
+    public void translatorShouldTranslateCorrectly() throws IOException {
         String testString = "asdateastasf";
-        SymbolTable table = TableFactory.create(testString);
+        SymbolTable table = TableFactory.create(new ByteArrayInputStream(testString.getBytes()));
         byte[] compressed = table.encode(testString);
-        assertEquals(testString, new String(table.decode(compressed)));
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        table.decode(new ByteArrayInputStream(compressed), bos);
+        byte[] decoded = bos.toByteArray();
+        assertEquals(testString, new String(decoded));
     }
 
     @Test
@@ -48,8 +56,8 @@ public class CharacterCountTest {
             "ASRTOIHASTOANSTATSASTJAStasdtohsdtosz",
             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
     })
-    public void compressedByteCodeShouldBeSmaller(String testString) {
-        SymbolTable table = TableFactory.create(testString);
+    public void compressedByteCodeShouldBeSmaller(String testString) throws IOException {
+        SymbolTable table = TableFactory.create(new ByteArrayInputStream(testString.getBytes()));
         byte[] compressed = table.encode(testString);
         assertTrue(binaryString(compressed).length() < binaryString(testString.getBytes()).length());
     }

@@ -12,4 +12,5 @@ public enum ErrorCode {
      * @see com.kurodev.filecompressor.table.SymbolTable
      */
     FILE_SIGNATURE_MISMATCH,
+    TABLE_SIGNATURE_NOT_FOUND
 }

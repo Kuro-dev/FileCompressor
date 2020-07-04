@@ -1,10 +1,9 @@
-package unitTests.progressTrackingTests;
+package unitTests.filetests.progressTrackingTests;
 
 import com.kurodev.filecompressor.interfaces.CompressionCallback;
 import com.kurodev.filecompressor.interfaces.ProgressCallBack;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -25,18 +24,18 @@ public class TestCallback implements ProgressCallBack, CompressionCallback {
     }
 
     @Override
-    public void onDone(Path path) {
-        System.out.println("File compression successful!");
+    public void onDone() {
+        System.out.println("File compression successful");
         latch.countDown();
+    }
+
+    @Override
+    public void onFail(IOException e) {
+        e.printStackTrace();
     }
 
     public CountDownLatch getLatch() {
         return latch;
-    }
-
-    @Override
-    public void onFail(IOException ex) {
-        System.out.println("FileCompression Failed");
     }
 
     @Override
