@@ -8,7 +8,6 @@ import java.util.List;
 /**
  * @author kuro
  **/
-//todo add deserialization Method for Creating from existing file
 public class TableFactory {
 
     private static List<CharCounter> createCountersFromTable(byte[] tableData) {
@@ -79,12 +78,8 @@ public class TableFactory {
         return new SymbolTable(counters);
     }
 
-    public static SymbolTable createFromTable(byte[] tableData, ProgressCallBack callback) {
-        return createFromTable(tableData, callback, callback.getInterval());
-    }
-
-    public static SymbolTable createFromTable(byte[] tableData, ProgressCallBack callBack, double progressInterval) {
+    public static SymbolTable createFromTable(byte[] tableData, ProgressCallBack callBack) {
         List<CharCounter> counters = createCountersFromTable(tableData);
-        return new ProgressTrackingSymbolTable(counters, callBack, progressInterval);
+        return new ProgressTrackingSymbolTable(counters, callBack, callBack.getInterval());
     }
 }
