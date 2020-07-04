@@ -15,7 +15,7 @@ import java.util.List;
 public class ProgressTrackingSymbolTable extends SymbolTable {
     private final ProgressCallBack callBack;
     private final double interval;
-    double lastProgress = 0;
+    private double lastProgress = 0;
 
 
     /**
@@ -30,11 +30,16 @@ public class ProgressTrackingSymbolTable extends SymbolTable {
         this.interval = interval;
     }
 
-    private void notifyCallback(double progress) {
+    private void checkProgress(double progress) {
         if (progress >= this.lastProgress + interval || progress >= 1) {
             callBack.onProgressChanged(progress);
             lastProgress = progress;
+            progressChanged(lastProgress);
         }
+    }
+
+    protected void progressChanged(double progress) {
+        //if i ever want to inherit and overwrite or possibly someone else.
     }
 
     @Override
@@ -55,10 +60,10 @@ public class ProgressTrackingSymbolTable extends SymbolTable {
 
             double progress = ((double) ((int) ((index / (double) total) * 100.0))) / 100.0;
             index++;
-            notifyCallback(progress);
+            checkProgress(progress);
         }
         writer.fillLastByte();
-        notifyCallback(1);
+        checkProgress(1);
     }
 
     @Override
@@ -82,7 +87,7 @@ public class ProgressTrackingSymbolTable extends SymbolTable {
 
             double progress = ((double) ((int) ((index / (double) total) * 100.0))) / 100.0;
             index++;
-            notifyCallback(progress);
+            checkProgress(progress);
         }
     }
 }
