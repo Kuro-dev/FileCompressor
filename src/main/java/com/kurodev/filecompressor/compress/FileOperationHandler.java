@@ -2,6 +2,9 @@ package com.kurodev.filecompressor.compress;
 
 import com.kurodev.filecompressor.exception.CompressionException;
 import com.kurodev.filecompressor.exception.ErrorCode;
+import com.kurodev.filecompressor.interfaces.CompressionCallback;
+import com.kurodev.filecompressor.interfaces.ProgressCallBack;
+import com.kurodev.filecompressor.table.SymbolTable;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,7 +17,8 @@ import java.nio.file.StandardOpenOption;
 public abstract class FileOperationHandler implements Runnable {
     protected final Path source;
     protected final Path dest;
-    private CompressionCallback callback;
+    protected ProgressCallBack progressCallback;
+    private CompressionCallback resultCallback;
 
     /**
      * @param source the source file to compress.
@@ -50,8 +54,12 @@ public abstract class FileOperationHandler implements Runnable {
      * Sets a consumer to be notified once the operation has been successfully executed.
      * The consumer will NOT be notified if the operation fails, as this will result in a RuntimeException.
      */
-    public void setCallback(CompressionCallback callback) {
-        this.callback = callback;
+    public void setResultCallback(CompressionCallback resultCallback) {
+        this.resultCallback = resultCallback;
+    }
+
+    public void setProgressCallback(ProgressCallBack callback) {
+        this.progressCallback = callback;
     }
 
     private void checkFileAccessibility() throws CompressionException {
@@ -66,11 +74,11 @@ public abstract class FileOperationHandler implements Runnable {
         try {
             checkFileAccessibility();
             work();
-            if (callback != null)
-                callback.onDone(dest);
+            if (resultCallback != null)
+                resultCallback.onDone(dest);
         } catch (IOException e) {
-            if (callback != null) {
-                callback.onFail(e);
+            if (resultCallback != null) {
+                resultCallback.onFail(e);
             } else {
                 throw new RuntimeException(e);
             }
@@ -85,4 +93,6 @@ public abstract class FileOperationHandler implements Runnable {
     }
 
     protected abstract void work() throws IOException;
+
+    protected abstract SymbolTable createSymbolTable(byte[] content);
 }

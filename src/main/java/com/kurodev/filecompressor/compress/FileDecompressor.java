@@ -45,9 +45,18 @@ public class FileDecompressor extends FileOperationHandler {
         int messageIndex = splitIndex + (SymbolTable.END_OF_TABLE_MARKER.length);
         byte[] tableData = new byte[splitIndex];
         System.arraycopy(data, 0, tableData, 0, splitIndex);
-        SymbolTable table = TableFactory.createFromFile(tableData);
+        SymbolTable table = createSymbolTable(tableData);
         byte[] decoded = table.decode(Arrays.copyOfRange(data, messageIndex, data.length));
         writeFile(decoded);
+    }
+
+    @Override
+    protected SymbolTable createSymbolTable(byte[] content) {
+        if (progressCallback != null) {
+            return TableFactory.createFromTable(content, progressCallback);
+        } else {
+            return TableFactory.createFromTable(content);
+        }
     }
 
     int signaturePresent(byte[] table) {

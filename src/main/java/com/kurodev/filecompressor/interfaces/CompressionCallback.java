@@ -1,4 +1,4 @@
-package com.kurodev.filecompressor.compress;
+package com.kurodev.filecompressor.interfaces;
 
 import java.io.IOException;
 import java.nio.file.Path;

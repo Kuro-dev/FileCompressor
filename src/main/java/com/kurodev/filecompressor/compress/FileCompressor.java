@@ -40,10 +40,18 @@ public class FileCompressor extends FileOperationHandler {
     @Override
     protected void work() throws IOException {
         final String content = Files.readString(source);
-        final SymbolTable table = TableFactory.create(content);
+        final SymbolTable table = createSymbolTable(content.getBytes());
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         output.write(table.getTable());
         output.write(table.encode(content));
         writeFile(output.toByteArray());
+    }
+
+    protected SymbolTable createSymbolTable(byte[] content) {
+        if (progressCallback != null) {
+            return TableFactory.create(content, progressCallback);
+        } else {
+            return TableFactory.create(content);
+        }
     }
 }
