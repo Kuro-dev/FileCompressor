@@ -3,7 +3,6 @@ package unitTests.filetests.progressTrackingTests;
 import com.kurodev.filecompressor.interfaces.CompressionCallback;
 import com.kurodev.filecompressor.interfaces.ProgressCallBack;
 
-import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -30,7 +29,7 @@ public class TestCallback implements ProgressCallBack, CompressionCallback {
     }
 
     @Override
-    public void onFail(IOException e) {
+    public void onFail(Exception e) {
         e.printStackTrace();
     }
 

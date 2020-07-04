@@ -3,6 +3,7 @@ package com.kurodev.filecompressor.table;
 import com.kurodev.filecompressor.exception.DecompressionException;
 import com.kurodev.filecompressor.exception.ErrorCode;
 import com.kurodev.filecompressor.interfaces.ProgressCallBack;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -13,9 +14,11 @@ import java.util.List;
  * @author kuro
  **/
 public class TableFactory {
+    private static final Logger logger = Logger.getLogger(TableFactory.class);
 
     private static List<CharCounter> createCountersFromTable(byte[] tableData) {
         final List<CharCounter> counters = new ArrayList<>();
+        logger.debug("Creating table from existing file");
         for (int i = 0; i < tableData.length; i = i + 2) {
             if (tableData.length > (i + 1)) {
                 byte key = tableData[i];
@@ -25,18 +28,23 @@ public class TableFactory {
                 counters.add(counter);
             }
         }
+        logger.trace("Table Created");
         return counters;
     }
 
-    private static List<CharCounter> createCountersFromString(InputStream source) throws IOException {
+    private static List<CharCounter> createCountersFromSteam(InputStream source) throws IOException {
         List<CharCounter> counters = new ArrayList<>();
+        logger.trace("Creating new table from source");
         int aChar;
-        while ((aChar = source.read()) > 0) {
+        while ((aChar = source.read()) != -1) {
             CharCounter counter = find(counters, (byte) aChar);
             counter.increment();
-            if (!counters.contains(counter))
+            if (!counters.contains(counter)) {
                 counters.add(counter);
+            }
         }
+        logger.trace("Table Created");
+        source.close();
         return counters;
     }
 
@@ -54,14 +62,14 @@ public class TableFactory {
 
 
     public static SymbolTable create(InputStream source) throws IOException {
-        List<CharCounter> counters = createCountersFromString(source);
+        List<CharCounter> counters = createCountersFromSteam(source);
         SymbolTable table = new SymbolTable(counters);
         table.evaluateTable();
         return table;
     }
 
     public static SymbolTable create(InputStream source, ProgressCallBack callBack, double progressInterval) throws IOException {
-        List<CharCounter> counters = createCountersFromString(source);
+        List<CharCounter> counters = createCountersFromSteam(source);
         SymbolTable table = new ProgressTrackingSymbolTable(counters, callBack, progressInterval);
         table.evaluateTable();
         return table;

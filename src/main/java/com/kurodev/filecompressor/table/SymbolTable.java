@@ -2,6 +2,7 @@ package com.kurodev.filecompressor.table;
 
 import com.kurodev.filecompressor.byteutils.reader.ByteReader;
 import com.kurodev.filecompressor.byteutils.writer.ByteWriter;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.Collections;
@@ -14,7 +15,7 @@ import java.util.List;
  **/
 public class SymbolTable {
     public static final byte[] END_OF_TABLE_MARKER = {0x17, 0x1b, 0x1b, 0x17};
-
+    private static final Logger logger = Logger.getLogger(SymbolTable.class);
     private final List<CharCounter> characterList;
 
     /**
@@ -67,6 +68,7 @@ public class SymbolTable {
     public void encode(InputStream in, OutputStream out) throws IOException {
         ByteWriter writer = new ByteWriter(out);
         int chara;
+        logger.trace("Encoding stream");
         while ((chara = in.read()) != -1) {
             CharCounter character = this.find((byte) chara);
             int zeros = character.getLeadingZeros();
@@ -76,10 +78,12 @@ public class SymbolTable {
             writer.writeOne();
         }
         writer.fillLastByte();
+        logger.trace("Stream Encoded");
     }
 
     public void decode(InputStream in, OutputStream out) throws IOException {
         final ByteReader reader = new ByteReader(in);
+        logger.trace("Decoding stream");
         int zeros = 0;
         while (reader.hasMore()) {
             boolean isAOne = reader.read();
@@ -92,6 +96,7 @@ public class SymbolTable {
                 zeros++;
             }
         }
+        logger.trace("Stream Decoded");
     }
 
     public byte[] getTable() {
