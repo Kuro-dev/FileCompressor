@@ -28,6 +28,7 @@ public class FileDecompressorTest extends FileOperationTest {
             FileDecompressor decompressor = CompressorFactory.decompressor(new ByteArrayInputStream(compressed.toByteArray()), decompressed);
             decompressor.run();
             assertEquals(Files.readString(file.original()), new String(decompressed.toByteArray()));
+            System.out.println("----------------D-O-N-E--------------------");
         }
     }
 }

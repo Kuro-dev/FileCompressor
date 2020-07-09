@@ -79,9 +79,7 @@ public abstract class FileOperationHandler implements Runnable {
         }
     }
 
-    protected void prepare() throws Exception {
-
-    }
+    protected abstract void prepare() throws Exception;
 
     protected abstract void work() throws IOException;
 

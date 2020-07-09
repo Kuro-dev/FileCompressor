@@ -13,6 +13,7 @@ import java.io.OutputStream;
 public class FileCompressor extends FileOperationHandler {
 
     private final InputStream tableSource;
+    private SymbolTable table;
 
     /**
      * @param source the source stream to compress.
@@ -25,8 +26,12 @@ public class FileCompressor extends FileOperationHandler {
 
 
     @Override
+    protected void prepare() throws Exception {
+        table = createSymbolTable(tableSource);
+    }
+
+    @Override
     protected void work() throws IOException {
-        SymbolTable table = createSymbolTable(tableSource);
         dest.write(table.getTable());
         table.encode(source, dest);
     }

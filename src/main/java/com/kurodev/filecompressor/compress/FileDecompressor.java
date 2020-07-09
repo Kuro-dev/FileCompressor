@@ -13,13 +13,19 @@ import java.io.OutputStream;
 public class FileDecompressor extends FileOperationHandler {
 
 
+    private SymbolTable table;
+
     protected FileDecompressor(InputStream src, OutputStream dest) {
         super(src, dest);
     }
 
     @Override
+    protected void prepare() throws Exception {
+        table = createSymbolTable(source);
+    }
+
+    @Override
     protected void work() throws IOException {
-        SymbolTable table = createSymbolTable(source);
         table.decode(source, dest);
     }
 

@@ -9,14 +9,15 @@ import java.nio.file.Paths;
  * @author kuro
  **/
 public enum TestFile {
-    TEST_FILE(Paths.get("./testfiles/TestCompressionFile.txt")),
-    SMALLER_TEST_FILE(Paths.get("./testfiles/SmallerTestFile.txt"));
+    SMALLER_TEST_FILE("SmallerTestFile.txt"),
+    MEDIUM_TEST_FILE("MediumTestFile.txt"),
+    BIG_TEST_FILE("BigTestFile.txt");
 
     private final Path original, compressed;
 
-    TestFile(Path path) {
-        original = path;
-        compressed = CompressorFactory.autogenDestFile(path);
+    TestFile(String fileName) {
+        original = Paths.get("./testfiles/" + fileName);
+        compressed = CompressorFactory.autogenDestFile(original);
     }
 
     public Path original() {
