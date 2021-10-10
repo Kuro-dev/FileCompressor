@@ -91,8 +91,7 @@ public class SymbolTable {
         final ByteReader reader = new ByteReader(in);
         logger.trace("Decoding stream");
         int zeros = 0;
-        while (reader.hasMore()) {
-            boolean isAOne = reader.read();
+        for (Boolean isAOne : reader) {
             if (isAOne) {
                 char character = (char) find(zeros);
                 out.write(character);

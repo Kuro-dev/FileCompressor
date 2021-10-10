@@ -30,7 +30,6 @@ public abstract class FileOperationHandler implements Runnable {
         this.dest = dest;
     }
 
-
     /**
      * Sets a consumer to be notified once the operation has been successfully executed.
      * The consumer will NOT be notified if the operation fails, as this will result in a RuntimeException.
