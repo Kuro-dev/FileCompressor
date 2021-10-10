@@ -102,6 +102,10 @@ public class TableFactory {
         return new ProgressTrackingSymbolTable(counters, callBack, callBack.getInterval());
     }
 
+    /*TODO(10/10/2021) important: Fix this. remove the end of table marker
+        instead work with a 2 byte table length that will be read first.
+         then just read the given value as bytes and return them
+         Similarly when writing the table, first write the length of it.*/
     public static byte[] extractTable(InputStream bytes) throws IOException {
         final byte[] delimiter = SymbolTable.END_OF_TABLE_MARKER;
         final PushbackInputStream in = new PushbackInputStream(bytes, delimiter.length);
