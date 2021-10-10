@@ -13,6 +13,7 @@ import java.nio.file.Paths;
  * @author kuro
  **/
 public class CompressorFactory {
+    public static final int STANDARD_BUF_SIZE = 1024 * 5;
     public static final String COMPRESSED_FILE_EXTENSION = ".cmp";
 
     public static Path autogenDestFile(Path source) {

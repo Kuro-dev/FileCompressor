@@ -1,5 +1,7 @@
 package com.kurodev.filecompressor.byteutils.reader;
 
+import com.kurodev.filecompressor.compress.CompressorFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -7,22 +9,37 @@ import java.io.InputStream;
  * @author kuro
  **/
 public class ByteReader {
-    private final int checkBit = 0b10000000;
+    private static final int CHECK_BIT = 0b10000000;
     private final InputStream bytes;
     private final int totalBytes;
     int index = 0;
     int current;
     byte turn;
     private boolean hasMore = true;
+    private final byte[] buffer;
+    int bufferIndex = 0;
+    int lastRead = -1;
 
     public ByteReader(InputStream bytes) throws IOException {
+        this(bytes, CompressorFactory.STANDARD_BUF_SIZE);
+    }
+
+    public ByteReader(InputStream bytes, int bufSize) throws IOException {
         this.bytes = bytes;
         totalBytes = bytes.available();
+        buffer = new byte[bufSize];
         assignNextByte();
     }
 
     private void assignNextByte() throws IOException {
-        current = bytes.read();
+        if (bufferIndex >= lastRead) {
+            lastRead = bytes.read(buffer) - 1;
+            bufferIndex = 0;
+        } else {
+            bufferIndex++;
+        }
+        current = buffer[bufferIndex];
+        turn = 0;
         index++;
     }
 
@@ -32,7 +49,6 @@ public class ByteReader {
         }
         if (index < totalBytes) {
             assignNextByte();
-            turn = 0;
         } else {
             hasMore = false;
         }
@@ -40,7 +56,7 @@ public class ByteReader {
 
     public boolean read() throws IOException {
         checkTurn();
-        boolean ret = ((current & checkBit) == checkBit);
+        boolean ret = ((current & CHECK_BIT) == CHECK_BIT);
         current <<= 1;
         turn++;
         return ret;

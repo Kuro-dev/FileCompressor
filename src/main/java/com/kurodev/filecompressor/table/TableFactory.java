@@ -1,5 +1,6 @@
 package com.kurodev.filecompressor.table;
 
+import com.kurodev.filecompressor.compress.CompressorFactory;
 import com.kurodev.filecompressor.exception.DecompressionException;
 import com.kurodev.filecompressor.exception.ErrorCode;
 import com.kurodev.filecompressor.interfaces.ProgressCallBack;
@@ -33,14 +34,19 @@ public class TableFactory {
     }
 
     private static List<CharCounter> createCountersFromSteam(InputStream source) throws IOException {
-        List<CharCounter> counters = new ArrayList<>();
+        List<CharCounter> counters = new ArrayList<>(source.available());
         logger.trace("Creating new table from source");
-        int aChar;
-        while ((aChar = source.read()) != -1) {
-            CharCounter counter = find(counters, (byte) aChar);
-            counter.increment();
-            if (!counters.contains(counter)) {
-                counters.add(counter);
+        byte[] buf = new byte[CompressorFactory.STANDARD_BUF_SIZE];
+        int lastRead = 0;
+        while (lastRead != -1) {
+            lastRead = source.read(buf);
+            for (int i = 0; i < lastRead; i++) {
+                int aChar = buf[i];
+                CharCounter counter = find(counters, (byte) aChar);
+                counter.increment();
+                if (!counters.contains(counter)) {
+                    counters.add(counter);
+                }
             }
         }
         logger.trace("Table Created");

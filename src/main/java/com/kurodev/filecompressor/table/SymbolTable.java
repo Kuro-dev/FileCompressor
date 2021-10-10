@@ -2,6 +2,7 @@ package com.kurodev.filecompressor.table;
 
 import com.kurodev.filecompressor.byteutils.reader.ByteReader;
 import com.kurodev.filecompressor.byteutils.writer.ByteWriter;
+import com.kurodev.filecompressor.compress.CompressorFactory;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -67,15 +68,20 @@ public class SymbolTable {
 
     public void encode(InputStream in, OutputStream out) throws IOException {
         ByteWriter writer = new ByteWriter(out);
-        int chara;
+        byte[] buf = new byte[CompressorFactory.STANDARD_BUF_SIZE];
+        int lastRead = 0;
         logger.trace("Encoding stream");
-        while ((chara = in.read()) != -1) {
-            CharCounter character = this.find((byte) chara);
-            int zeros = character.getLeadingZeros();
-            for (int i = 0; i < zeros; i++) {
-                writer.writeZero();
+        while (lastRead != -1) {
+            lastRead = in.read(buf);
+            for (int i = 0; i < lastRead; i++) {
+                int chara = buf[i];
+                CharCounter character = this.find((byte) chara);
+                int zeros = character.getLeadingZeros();
+                for (int iZero = 0; iZero < zeros; iZero++) {
+                    writer.writeZero();
+                }
+                writer.writeOne();
             }
-            writer.writeOne();
         }
         writer.fillLastByte();
         logger.trace("Stream Encoded");

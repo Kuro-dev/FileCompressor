@@ -20,6 +20,7 @@ public class FileDecompressorTest extends FileOperationTest {
     @Test
     public void compareFileContentTest() throws IOException {
         for (TestFile file : TestFile.values()) {
+            System.out.println("Testing " + file.original());
             ByteArrayOutputStream compressed = new ByteArrayOutputStream();
             FileCompressor compressor = CompressorFactory.compressor(file.original(), compressed);
             compressor.run();
@@ -27,7 +28,7 @@ public class FileDecompressorTest extends FileOperationTest {
             ByteArrayOutputStream decompressed = new ByteArrayOutputStream();
             FileDecompressor decompressor = CompressorFactory.decompressor(new ByteArrayInputStream(compressed.toByteArray()), decompressed);
             decompressor.run();
-            assertEquals(Files.readString(file.original()), new String(decompressed.toByteArray()));
+            assertEquals(Files.readString(file.original()), decompressed.toString());
             System.out.println("----------------D-O-N-E--------------------");
         }
     }
