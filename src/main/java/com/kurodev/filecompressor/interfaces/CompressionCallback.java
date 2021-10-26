@@ -1,13 +1,10 @@
 package com.kurodev.filecompressor.interfaces;
 
-import java.io.IOException;
-import java.nio.file.Path;
-
 /**
  * @author kuro
  **/
 public interface CompressionCallback {
-    void onDone(Path path);
+    void onDone();
 
-    void onFail(IOException ex);
+    void onFail(Exception e);
 }

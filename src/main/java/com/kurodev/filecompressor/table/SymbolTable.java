@@ -2,8 +2,10 @@ package com.kurodev.filecompressor.table;
 
 import com.kurodev.filecompressor.byteutils.reader.ByteReader;
 import com.kurodev.filecompressor.byteutils.writer.ByteWriter;
+import com.kurodev.filecompressor.compress.CompressorFactory;
+import org.apache.log4j.Logger;
 
-import java.io.ByteArrayOutputStream;
+import java.io.*;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -13,8 +15,8 @@ import java.util.List;
  * @see TableFactory
  **/
 public class SymbolTable {
-    public static final byte[] END_OF_TABLE_MARKER = {0x1b, 0x1b, 0x17};
-
+    public static final byte[] END_OF_TABLE_MARKER = {0x17, 0x1b, 0x1b, 0x17};
+    private static final Logger logger = Logger.getLogger(SymbolTable.class);
     private final List<CharCounter> characterList;
 
     /**
@@ -55,39 +57,51 @@ public class SymbolTable {
         throw new RuntimeException("code missing in table: '" + leadingZeros + "'");
     }
 
-    public byte[] encode(String chars) {
-        return encode(chars.getBytes());
+    /**
+     * not recommended to use for large input.
+     */
+    public byte[] encode(String chars) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        encode(new ByteArrayInputStream(chars.getBytes()), out);
+        return out.toByteArray();
     }
 
-    public byte[] encode(byte[] chars) {
-        ByteWriter writer = new ByteWriter();
-        for (byte chara : chars) {
-            CharCounter character = this.find(chara);
-            int zeros = character.getLeadingZeros();
-            for (int i = 0; i < zeros; i++) {
-                writer.writeZero();
+    public void encode(InputStream in, OutputStream out) throws IOException {
+        ByteWriter writer = new ByteWriter(out);
+        byte[] buf = new byte[CompressorFactory.STANDARD_BUF_SIZE];
+        int lastRead = 0;
+        logger.trace("Encoding stream");
+        while (lastRead != -1) {
+            lastRead = in.read(buf);
+            for (int i = 0; i < lastRead; i++) {
+                int chara = buf[i];
+                CharCounter character = this.find((byte) chara);
+                int zeros = character.getLeadingZeros();
+                for (int iZero = 0; iZero < zeros; iZero++) {
+                    writer.writeZero();
+                }
+                writer.writeOne();
             }
-            writer.writeOne();
         }
         writer.fillLastByte();
-        return writer.getBytes();
+        logger.trace("Stream Encoded");
     }
 
-    public byte[] decode(byte[] msg) {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        final ByteReader reader = new ByteReader(msg);
+    public void decode(InputStream in, OutputStream out) throws IOException {
+        final ByteReader reader = new ByteReader(in);
+        logger.trace("Decoding stream");
         int zeros = 0;
-        while (reader.hasMore()) {
-            boolean isAOne = reader.read();
+        for (Boolean isAOne : reader) {
             if (isAOne) {
                 char character = (char) find(zeros);
-                os.write(character);
+                out.write(character);
+                out.flush();
                 zeros = 0;
             } else {
                 zeros++;
             }
         }
-        return os.toByteArray();
+        logger.trace("Stream Decoded");
     }
 
     public byte[] getTable() {

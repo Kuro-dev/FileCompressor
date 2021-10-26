@@ -1,22 +1,23 @@
 package com.kurodev.filecompressor.compress;
 
-import com.kurodev.filecompressor.exception.CompressionException;
-import com.kurodev.filecompressor.exception.ErrorCode;
 import com.kurodev.filecompressor.interfaces.CompressionCallback;
 import com.kurodev.filecompressor.interfaces.ProgressCallBack;
 import com.kurodev.filecompressor.table.SymbolTable;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 
 /**
  * @author kuro
  **/
 public abstract class FileOperationHandler implements Runnable {
-    protected final Path source;
-    protected final Path dest;
+    protected final Logger logger = Logger.getLogger(this.getClass());
+    protected final InputStream source;
+    protected final OutputStream dest;
     protected ProgressCallBack progressCallback;
     private CompressionCallback resultCallback;
 
@@ -24,30 +25,9 @@ public abstract class FileOperationHandler implements Runnable {
      * @param source the source file to compress.
      * @param dest   the destination file to generate
      */
-    public FileOperationHandler(Path source, Path dest) {
-
+    protected FileOperationHandler(InputStream source, OutputStream dest) {
         this.source = source;
         this.dest = dest;
-    }
-
-    public Path getSrcFile() {
-        return source;
-    }
-
-    public Path getDestFile() {
-        return dest;
-    }
-
-    protected void fail(String reason) throws CompressionException {
-        throw new CompressionException(reason);
-    }
-
-    protected void fail(IOException e) throws CompressionException {
-        throw new CompressionException(e);
-    }
-
-    protected void fail(ErrorCode code) throws CompressionException {
-        throw new CompressionException(code);
     }
 
     /**
@@ -62,21 +42,34 @@ public abstract class FileOperationHandler implements Runnable {
         this.progressCallback = callback;
     }
 
-    private void checkFileAccessibility() throws CompressionException {
-        if (!Files.isRegularFile(source))
-            fail("Must be a file");
-        if (!Files.isReadable(source))
-            fail("Cannot read file");
+    protected static String humanReadableByteCount(long bytes) {
+        long absB = bytes == Long.MIN_VALUE ? Long.MAX_VALUE : Math.abs(bytes);
+        if (absB < 1024) {
+            return bytes + " B";
+        }
+        long value = absB;
+        CharacterIterator ci = new StringCharacterIterator("KMGTPE");
+        for (int i = 40; i >= 0 && absB > 0xfffccccccccccccL >> i; i -= 10) {
+            value >>= 10;
+            ci.next();
+        }
+        value *= Long.signum(bytes);
+        return String.format("%.1f %ciB", value / 1024.0, ci.current());
     }
 
     @Override
     public void run() {
         try {
-            checkFileAccessibility();
+            logger.debug("Starting " + this.getClass().getSimpleName());
+            logger.debug("Aprox input size: " + humanReadableByteCount(source.available()));
+            prepare();
             work();
+            logger.debug("operation finished");
+            cleanup();
             if (resultCallback != null)
-                resultCallback.onDone(dest);
-        } catch (IOException e) {
+                resultCallback.onDone();
+        } catch (Exception e) {
+            logger.error("Compression failed", e);
             if (resultCallback != null) {
                 resultCallback.onFail(e);
             } else {
@@ -85,14 +78,14 @@ public abstract class FileOperationHandler implements Runnable {
         }
     }
 
-    protected void writeFile(byte[] bytes) throws IOException {
-        if (!Files.exists(dest)) {
-            Files.createFile(dest);
-        }
-        Files.write(dest, bytes, StandardOpenOption.WRITE);
-    }
+    protected abstract void prepare() throws Exception;
 
     protected abstract void work() throws IOException;
 
-    protected abstract SymbolTable createSymbolTable(byte[] content);
+    protected abstract SymbolTable createSymbolTable(InputStream content) throws IOException;
+
+    protected void cleanup() throws IOException {
+        source.close();
+        dest.close();
+    }
 }

@@ -3,3 +3,7 @@
 target
 *.cmp
 /testfiles/TestDecompressionFile.txt
+*.test
+/src/test/java/unitTests/filetests/benchmark/
+/logs
+/testfiles/BigTestFile.txt
